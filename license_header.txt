@@ -1,0 +1,3 @@
+Copyright 2026 nnthanh101@gmail.com (oceansoft.io). All Rights Reserved.
+Based on Innovation Sandbox on AWS by Amazon.com, Inc. (Apache-2.0).
+SPDX-License-Identifier: Apache-2.0

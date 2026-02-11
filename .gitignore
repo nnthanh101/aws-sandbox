@@ -1,0 +1,31 @@
+node_modules/
+dist/
+coverage/
+bom.json
+.env
+build
+git-info
+*.tsbuildinfo
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+deployment/global-s3-assets
+deployment/regional-s3-assets
+deployment/ecr
+open-source/
+staging/
+
+# Temporary folders
+tmp/
+temp/
+.temp_*/
+
+### VisualStudioCode ###
+.vscode
+
+### macOS ###
+.DS_Store
+
+.idea

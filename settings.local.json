@@ -1,0 +1,18 @@
+{
+  "version": "3.0.0",
+  "project": "sandbox-for-aws",
+  "permissions": {
+    "allow": ["Read", "Glob", "Grep", "Bash(npm,npx,cdk,node,task,git status,git diff,git log,jq,docker)"],
+    "ask": ["Write", "Edit", "Bash(git commit,git add)"],
+    "deny": ["Bash(git push,git push --force,gh pr create,npm publish,rm -rf,sudo,cdk destroy --all)"]
+  },
+  "env": {
+    "ADLC_PROJECT": "sandbox-for-aws",
+    "ADLC_VERSION": "3.0.0",
+    "ADLC_PASS_RATE_THRESHOLD": "99.5",
+    "ADLC_MANDATORY_AGENTS": "product-owner,cloud-architect",
+    "ADLC_ENFORCEMENT_MODE": "BLOCKING",
+    "ADLC_GIT_PUSH_BLOCKED": "true",
+    "AWS_REGION": "ap-southeast-2"
+  }
+}

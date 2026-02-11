@@ -1,0 +1,59 @@
+// Copyright 2026 nnthanh101@gmail.com (oceansoft.io). Based on Innovation Sandbox on AWS by Amazon.com, Inc.
+// SPDX-License-Identifier: Apache-2.0
+import { z } from "zod";
+
+export const IsbRoleSchema = z.enum(["Admin", "Manager", "User"]);
+export const IsbUserSchema = z.object({
+  email: z.string().email(),
+  displayName: z.string().optional(),
+  userName: z.string().optional(),
+  userId: z.string().optional(),
+  roles: z.array(IsbRoleSchema).optional(),
+});
+
+export type IsbRole = z.infer<typeof IsbRoleSchema>;
+export type IsbUser = z.infer<typeof IsbUserSchema>;
+
+export type JSendResponse =
+  | JSendSuccessResponse
+  | JSendFailResponse
+  | JSendErrorResponse;
+
+export type JSendSuccessResponse = {
+  status: "success";
+  data: JSendData;
+};
+
+export type JSendFailResponse = {
+  status: "fail";
+  data: JSendData;
+};
+
+export type JSendErrorResponse = {
+  status: "error";
+  message: string;
+  data?: JSendData;
+};
+
+export type JSendData = Record<string, any> & { errors?: JSendErrorObject[] };
+
+export type JSendErrorObject = {
+  field?: string;
+  message: string;
+};
+
+export const SSM_PARAM_NAME_PREFIX = "/Sandbox";
+export const SSM_PARAM_NAME_PREFIX_SIMPLE = "Sandbox";
+export const SECRET_NAME_PREFIX = "/Sandbox";
+
+export function sharedAccountPoolSsmParamName(namespace: string) {
+  return `${SSM_PARAM_NAME_PREFIX_SIMPLE}_${namespace}_AccountPool_Configuration`;
+}
+
+export function sharedDataSsmParamName(namespace: string) {
+  return `${SSM_PARAM_NAME_PREFIX_SIMPLE}_${namespace}_Data_Configuration`;
+}
+
+export function sharedIdcSsmParamName(namespace: string) {
+  return `${SSM_PARAM_NAME_PREFIX_SIMPLE}_${namespace}_Idc_Configuration`;
+}
