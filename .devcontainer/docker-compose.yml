@@ -1,0 +1,53 @@
+# =============================================================================
+# aws-sandbox DevContainer Docker Compose
+# =============================================================================
+# Extends: ../docker-compose.base.yml (SINGLE SOURCE OF TRUTH)
+# Usage: VS Code "Reopen in Container"
+#
+# Constitutional: ADLC v3.0.0 (Principle IV: Hybrid Deployment)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # LocalStack: AWS Service Emulation (Tier 2 Testing)
+  # ---------------------------------------------------------------------------
+  localstack:
+    extends:
+      file: ../docker-compose.base.yml
+      service: localstack
+
+  # ---------------------------------------------------------------------------
+  # sandbox-dev: CDK/TypeScript Development (DevContainer mode)
+  # ---------------------------------------------------------------------------
+  sandbox-dev:
+    extends:
+      file: ../docker-compose.base.yml
+      service: sandbox-dev
+    volumes:
+      # Monorepo root mount
+      - ..:/workspace:cached
+      # AWS credentials (read-only, for Tier 3)
+      - ~/.aws:/home/os/.aws:ro
+      # Docker socket (for CDK bundling + LocalStack Lambda executor)
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Cache directories
+      - npm-cache:/home/os/.npm
+      - trivy-cache:/workspace/.cache/trivy
+    command: sleep infinity
+
+networks:
+  sandbox-network:
+    driver: bridge
+    name: ${NETWORK_NAME:-sandbox-network}
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET:-172.29.0.0/16}
+          gateway: ${NETWORK_GATEWAY:-172.29.0.1}
+
+volumes:
+  localstack-data:
+    name: ${LOCALSTACK_VOLUME:-sandbox-localstack-data}
+  trivy-cache:
+    name: ${TRIVY_VOLUME:-sandbox-trivy-cache}
+  npm-cache:
+    name: ${NPM_VOLUME:-sandbox-npm-cache}

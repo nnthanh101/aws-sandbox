@@ -14,6 +14,13 @@ const app = new cdk.App();
 
 const context = getSolutionContext(app.node);
 
+// FOCUS 1.3 Cost Allocation Tags (applied to all stacks)
+cdk.Tags.of(app).add("CostCenter", "sandbox");
+cdk.Tags.of(app).add("Environment", context.deploymentMode);
+cdk.Tags.of(app).add("Project", context.solutionName);
+cdk.Tags.of(app).add("Owner", "platform-team");
+cdk.Tags.of(app).add("ManagedBy", "cdk");
+
 const synthesizer = new SolutionsEngineeringSynthesizer({
   generateBootstrapVersionRule: false,
   fileAssetsBucketName:

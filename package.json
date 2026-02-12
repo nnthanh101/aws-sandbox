@@ -1,7 +1,7 @@
 {
   "name": "sandbox-for-aws",
   "version": "2.0.0",
-  "description": "Enterprise Innovation Sandbox on AWS — CDK v2",
+  "description": "Enterprise Sandbox for AWS (S101) — CDK v2",
   "author": "nnthanh101@gmail.com (oceansoft.io)",
   "homepage": "https://nnthanh101.github.io/aws-sandbox",
   "repository": {

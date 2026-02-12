@@ -1,6 +1,6 @@
 {
   "name": "sandbox-shared-json-param-parser",
-  "description": "Parsed shared SSM configuration parameters from spoke stacks - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Parsed shared SSM configuration parameters from spoke stacks - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

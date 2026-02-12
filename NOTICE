@@ -921,6 +921,42 @@ aws-cdk under the Apache-2.0 license.
 zod under the MIT license.
 @aws-lambda-powertools/logger under the MIT-0 license.
 @aws-lambda-powertools/tracer under the MIT-0 license.
+
+**********************
+REBRANDED PACKAGES
+**********************
+
+The following packages are derived works of the original @amzn/innovation-sandbox-*
+packages listed above, rebranded under the sandbox-* namespace. They retain the same
+Apache-2.0 license and original copyright notices from Amazon.com, Inc.
+
+sandbox-commons (derived from @amzn/innovation-sandbox-commons)
+sandbox-infrastructure (derived from @amzn/innovation-sandbox-infrastructure)
+sandbox-frontend (derived from @amzn/innovation-sandbox-frontend)
+sandbox-initialize-cleanup (derived from @amzn/innovation-sandbox-initialize-cleanup)
+sandbox-account-drift-monitoring (derived from @amzn/innovation-sandbox-account-drift-monitoring)
+sandbox-account-lifecycle-management (derived from @amzn/innovation-sandbox-account-lifecycle-management)
+sandbox-lease-monitoring (derived from @amzn/innovation-sandbox-lease-monitoring)
+sandbox-accounts (derived from @amzn/innovation-sandbox-accounts)
+sandbox-authorizer (derived from @amzn/innovation-sandbox-authorizer)
+sandbox-configurations (derived from @amzn/innovation-sandbox-configurations)
+sandbox-lease-templates (derived from @amzn/innovation-sandbox-lease-templates)
+sandbox-leases (derived from @amzn/innovation-sandbox-leases)
+sandbox-sso-handler (derived from @amzn/innovation-sandbox-sso-handler)
+sandbox-cost-allocation-tag-activator (derived from @amzn/innovation-sandbox-cost-allocation-tag-activator)
+sandbox-deployment-uuid (derived from @amzn/innovation-sandbox-deployment-uuid)
+sandbox-idc-configurer (derived from @amzn/innovation-sandbox-idc-configurer)
+sandbox-shared-json-param-parser (derived from @amzn/innovation-sandbox-shared-json-param-parser)
+sandbox-secret-rotator (derived from @amzn/innovation-sandbox-secret-rotator)
+sandbox-cost-reporting (derived from @amzn/innovation-sandbox-cost-reporting)
+sandbox-metrics-heartbeat (derived from @amzn/innovation-sandbox-metrics-heartbeat)
+sandbox-group-cost-reporting (derived from @amzn/innovation-sandbox-group-cost-reporting)
+sandbox-log-archiving (derived from @amzn/innovation-sandbox-log-archiving)
+sandbox-metrics-log-subscriber (derived from @amzn/innovation-sandbox-metrics-log-subscriber)
+sandbox-email-notification (derived from @amzn/innovation-sandbox-email-notification)
+sandbox-layer-commons (derived from @amzn/innovation-sandbox-layer-commons)
+sandbox-layer-dependencies (derived from @amzn/innovation-sandbox-layer-dependencies)
+
 aws-xray-sdk-core under the Apache-2.0 license.
 @types/cls-hooked under the MIT license.
 atomic-batcher under the MIT license.

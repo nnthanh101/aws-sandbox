@@ -1,6 +1,6 @@
 {
   "name": "sandbox-frontend",
-  "description": "Frontend - Innovation Sandbox on AWS (SO0284)",
+  "description": "Frontend - Sandbox for AWS (S101)",
   "private": true,
   "version": "1.1.8",
   "type": "module",

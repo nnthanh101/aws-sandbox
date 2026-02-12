@@ -1,6 +1,6 @@
 {
   "name": "sandbox-group-cost-reporting",
-  "description": "Group Cost Reporting - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Group Cost Reporting - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

@@ -23,7 +23,7 @@ assignees: ""
 - [ ] Version: [e.g. v1.0.0]
 
 To get the version of the solution, you can look at the description of the created
-CloudFormation stack. For example, _"(SO0284) Innovation Sandbox on AWS Stack, v1.0.0"_.
+CloudFormation stack. For example, _"(S101) Sandbox for AWS Stack, v2.0.0"_.
 
 - [ ] Region: [e.g. us-east-1]
 - [ ] Was the solution modified from the version published on this repository?

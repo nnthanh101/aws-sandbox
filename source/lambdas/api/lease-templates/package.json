@@ -1,6 +1,6 @@
 {
   "name": "sandbox-lease-templates",
-  "description": "Lease Templates - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Lease Templates - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

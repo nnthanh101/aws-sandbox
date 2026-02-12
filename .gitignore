@@ -29,3 +29,15 @@ temp/
 .DS_Store
 
 .idea
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
+# LocalStack overrides (may contain account-specific values)
+.env.localstack
+
+# ADLC framework symlinks (local-only), ADLC framework is NOT public on GitHub
+.claude
+.specify

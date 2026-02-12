@@ -1,6 +1,6 @@
 {
   "name": "sandbox-log-archiving",
-  "description": "Log archiving - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Log archiving - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

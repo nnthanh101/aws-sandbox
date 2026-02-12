@@ -3,8 +3,8 @@
   "project": "sandbox-for-aws",
   "permissions": {
     "allow": ["Read", "Glob", "Grep", "Bash(npm,npx,cdk,node,task,git status,git diff,git log,jq,docker)"],
-    "ask": ["Write", "Edit", "Bash(git commit,git add)"],
-    "deny": ["Bash(git push,git push --force,gh pr create,npm publish,rm -rf,sudo,cdk destroy --all)"]
+    "ask": ["Write", "Edit"],
+    "deny": ["Bash(git add,git commit,git push,git push --force,git reset,git revert,git rebase,gh pr create,npm publish,rm -rf,sudo,cdk destroy --all)"]
   },
   "env": {
     "ADLC_PROJECT": "sandbox-for-aws",

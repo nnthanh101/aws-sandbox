@@ -1,6 +1,6 @@
 {
   "name": "sandbox-initialize-cleanup",
-  "description": "Initialize Cleanup - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Initialize Cleanup - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

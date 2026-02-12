@@ -1,0 +1,127 @@
+# =============================================================================
+# aws-sandbox Docker Compose - SINGLE SOURCE OF TRUTH (Base Configuration)
+# =============================================================================
+# DO NOT DUPLICATE - All other compose files should extend this one
+# Constitutional: ADLC v3.0.0 (KISS/DRY/LEAN)
+#
+# Files that extend this base:
+#   - docker-compose.yml (production/standalone mode)
+#   - .devcontainer/docker-compose.yml (devcontainer mode)
+#
+# Environment variables: See .env.localstack for defaults
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # LocalStack: AWS Service Emulation (Tier 2 Testing)
+  # ---------------------------------------------------------------------------
+  localstack:
+    container_name: ${LOCALSTACK_CONTAINER:-sandbox-localstack}
+    image: localstack/localstack:${LOCALSTACK_VERSION:-latest}
+    ports:
+      - "${LOCALSTACK_PORT:-4566}:4566"
+      - "4510-4559:4510-4559"
+    networks:
+      sandbox-network:
+        ipv4_address: ${LOCALSTACK_IP:-172.29.0.2}
+    environment:
+      # Core LocalStack configuration
+      - SERVICES=${LOCALSTACK_SERVICES:-s3,dynamodb,sqs,lambda,apigateway,cloudformation,iam,sts,logs,events,ssm,secretsmanager,kms,sns,stepfunctions}
+      - DEBUG=${LOCALSTACK_DEBUG:-0}
+      - DATA_DIR=/var/lib/localstack
+      - LAMBDA_EXECUTOR=docker
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      # AWS configuration
+      - AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-2}
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      # S3 path-style access
+      - S3_SKIP_SIGNATURE_VALIDATION=1
+      - HOSTNAME_EXTERNAL=localstack
+      # Performance
+      - EAGER_SERVICE_LOADING=1
+      - SKIP_INFRA_DOWNLOADS=0
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=30
+      - LAMBDA_REMOVE_CONTAINERS=true
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # sandbox-dev: CDK/TypeScript Development Environment
+  # ---------------------------------------------------------------------------
+  # Image: nnthanh101/terraform (Chainguard Wolfi, Node 22 + CDK v2 + AWS CLI v2)
+  # Tools: Terraform, CDK, AWS CLI, Trivy, Checkov, task runner
+  # ---------------------------------------------------------------------------
+  sandbox-dev:
+    container_name: ${SANDBOX_CONTAINER:-sandbox-dev}
+    image: nnthanh101/terraform:${TERRAFORM_IMAGE_TAG:-latest}
+    working_dir: /workspace
+    ports:
+      - "3000:3000"
+      - "5173-5179:5173-5179"
+    environment:
+      # LocalStack endpoints
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ENDPOINT_URL_S3=http://s3.localstack:4566
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - LOCALSTACK_HOSTNAME=localstack
+      # AWS credentials (for LocalStack)
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-2}
+      - AWS_S3_FORCE_PATH_STYLE=true
+      # CDK configuration (parameterized — no hardcoding)
+      - CDK_DEFAULT_ACCOUNT=${CDK_ACCOUNT:-000000000000}
+      - CDK_DEFAULT_REGION=${AWS_REGION:-ap-southeast-2}
+      - CDK_QUALIFIER=${CDK_QUALIFIER:-hnb659fds}
+      - CDK_DISABLE_LEGACY_EXPORT_WARNING=1
+      # ADLC evidence collection (Principle V: Observability)
+      - ADLC_PROJECT=aws-sandbox
+      - ADLC_TIER=tier2
+      - EVIDENCE_DIR=/workspace/tmp/aws-sandbox
+    volumes:
+      # Docker socket (for CDK bundling + LocalStack Lambda executor)
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Cache directories
+      - trivy-cache:/workspace/.cache/trivy
+    networks:
+      sandbox-network:
+        ipv4_address: ${SANDBOX_IP:-172.29.0.3}
+    # DNS for virtual-hosted style S3 bucket names
+    extra_hosts:
+      - "localstack:${LOCALSTACK_IP:-172.29.0.2}"
+      - "s3.localstack:${LOCALSTACK_IP:-172.29.0.2}"
+      - "localstack.localstack.cloud:${LOCALSTACK_IP:-172.29.0.2}"
+      # CDK asset bucket DNS (parameterized via .env.localstack)
+      - "cdk-${CDK_QUALIFIER:-hnb659fds}-assets-${CDK_ACCOUNT:-000000000000}-${AWS_REGION:-ap-southeast-2}.s3.localstack:${LOCALSTACK_IP:-172.29.0.2}"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "sh", "-c", "node --version && cdk --version && aws --version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  sandbox-network:
+    driver: bridge
+    name: ${NETWORK_NAME:-sandbox-network}
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET:-172.29.0.0/16}
+          gateway: ${NETWORK_GATEWAY:-172.29.0.1}
+
+volumes:
+  localstack-data:
+    name: ${LOCALSTACK_VOLUME:-sandbox-localstack-data}
+  trivy-cache:
+    name: ${TRIVY_VOLUME:-sandbox-trivy-cache}

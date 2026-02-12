@@ -37,12 +37,12 @@ exports[`IdcStack Snapshot > matches the snapshot 1`] = `
         "deploymentMode": "prod",
         "logLevel": "INFO",
         "publicEcrRegistry": "public.ecr.aws/aws-solutions",
-        "publicEcrTag": "v1.1.8",
+        "publicEcrTag": "2.0.0",
         "s3LogsArchiveRetentionInDays": 365,
         "s3LogsGlacierRetentionInDays": 2555,
-        "solutionId": "SO0284",
-        "solutionName": "innovation-sandbox-on-aws",
-        "version": "v1.1.8",
+        "solutionId": "S101",
+        "solutionName": "sandbox-for-aws",
+        "version": "2.0.0",
       },
     },
   },
@@ -417,7 +417,7 @@ exports[`IdcStack Snapshot > matches the snapshot 1`] = `
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "IdcConfigurer",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -1443,12 +1443,12 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
         "deploymentMode": "prod",
         "logLevel": "INFO",
         "publicEcrRegistry": "public.ecr.aws/aws-solutions",
-        "publicEcrTag": "v1.1.8",
+        "publicEcrTag": "2.0.0",
         "s3LogsArchiveRetentionInDays": 365,
         "s3LogsGlacierRetentionInDays": 2555,
-        "solutionId": "SO0284",
-        "solutionName": "innovation-sandbox-on-aws",
-        "version": "v1.1.8",
+        "solutionId": "S101",
+        "solutionName": "sandbox-for-aws",
+        "version": "2.0.0",
       },
     },
   },
@@ -1767,7 +1767,7 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -2252,6 +2252,524 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
       },
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
+    },
+    "IsbKmsKeyIsbAccountPoolStack2E89BFA0": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "Encryption Key for Innovation Sandbox: IsbAccountPoolStack",
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "logs.amazonaws.com",
+              },
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "IsbKmsKeyIsbAccountPoolStackAlias26F82DA1": {
+      "Properties": {
+        "AliasName": {
+          "Fn::Join": [
+            "",
+            [
+              "alias/AwsSolutions/Sandbox/",
+              {
+                "Ref": "Namespace",
+              },
+              "/IsbAccountPoolStack",
+            ],
+          ],
+        },
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "IsbKmsKeyIsbAccountPoolStack2E89BFA0",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "IsbStackSet": {
+      "Properties": {
+        "AutoDeployment": {
+          "Enabled": true,
+          "RetainStacksOnAccountRemoval": false,
+        },
+        "Capabilities": [
+          "CAPABILITY_NAMED_IAM",
+        ],
+        "Description": "StackSet for Innovation Sandbox",
+        "ManagedExecution": {
+          "Active": true,
+        },
+        "OperationPreferences": {
+          "ConcurrencyMode": "SOFT_FAILURE_TOLERANCE",
+          "FailureTolerancePercentage": 100,
+          "MaxConcurrentPercentage": 100,
+          "RegionConcurrencyType": "PARALLEL",
+        },
+        "Parameters": [
+          {
+            "ParameterKey": "Namespace",
+            "ParameterValue": {
+              "Ref": "Namespace",
+            },
+          },
+          {
+            "ParameterKey": "HubAccountId",
+            "ParameterValue": {
+              "Ref": "HubAccountId",
+            },
+          },
+        ],
+        "PermissionModel": "SERVICE_MANAGED",
+        "StackInstancesGroup": [
+          {
+            "DeploymentTargets": {
+              "OrganizationalUnitIds": [
+                {
+                  "Fn::GetAtt": [
+                    "SandboxAccountPoolOu",
+                    "Id",
+                  ],
+                },
+              ],
+            },
+            "Regions": [
+              {
+                "Ref": "AWS::Region",
+              },
+            ],
+          },
+        ],
+        "StackSetName": {
+          "Fn::Join": [
+            "",
+            [
+              "Isb-",
+              {
+                "Ref": "Namespace",
+              },
+              "-SandboxAccountResources",
+            ],
+          ],
+        },
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+        "TemplateURL": "Omitted to remove snapshot dependency on hash",
+      },
+      "Type": "AWS::CloudFormation::StackSet",
+    },
+    "OrgMgtRoleADB4C27C": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:PrincipalArn": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":iam::",
+                        {
+                          "Ref": "HubAccountId",
+                        },
+                        ":role/Sandbox-",
+                        {
+                          "Ref": "Namespace",
+                        },
+                        "-IntermediateRole",
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "HubAccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Role to be assumed for operations on the org management account",
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              "Sandbox-",
+              {
+                "Ref": "Namespace",
+              },
+              "-OrgMgtRole",
+            ],
+          ],
+        },
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "OrganizationsPolicyFD65B3A6": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "organizations:ListOrganizationalUnitsForParent",
+                "organizations:ListAccountsForParent",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SandboxAccountPoolOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "AvailableOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ActiveOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "CleanUpOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "QuarantineOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "EntryOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExitOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "FrozenOu",
+                    "Arn",
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "organizations:MoveAccount",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "AvailableOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ActiveOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "CleanUpOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "QuarantineOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "EntryOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "ExitOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "FrozenOu",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":organizations::",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":account/",
+                      {
+                        "Fn::Select": [
+                          1,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Fn::GetAtt": [
+                                  "SandboxAccountPoolOu",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":organizations::",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root/",
+                      {
+                        "Fn::Select": [
+                          1,
+                          {
+                            "Fn::Split": [
+                              "/",
+                              {
+                                "Fn::GetAtt": [
+                                  "SandboxAccountPoolOu",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "organizations:DescribeAccount",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":organizations::",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":account/",
+                    {
+                      "Fn::Select": [
+                        1,
+                        {
+                          "Fn::Split": [
+                            "/",
+                            {
+                              "Fn::GetAtt": [
+                                "SandboxAccountPoolOu",
+                                "Arn",
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "OrganizationsPolicyFD65B3A6",
+        "Roles": [
+          {
+            "Ref": "OrgMgtRoleADB4C27C",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "QuarantineOu": {
+      "Properties": {
+        "Name": "Quarantine",
+        "ParentId": {
+          "Fn::GetAtt": [
+            "SandboxAccountPoolOu",
+            "Id",
+          ],
+        },
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+      },
+      "Type": "AWS::Organizations::OrganizationalUnit",
     },
     "SandboxAccountPoolOu": {
       "Properties": {
@@ -3092,524 +3610,6 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
       },
       "Type": "AWS::Organizations::Policy",
     },
-    "IsbKmsKeyIsbAccountPoolStack2E89BFA0": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "Description": "Encryption Key for Innovation Sandbox: IsbAccountPoolStack",
-        "EnableKeyRotation": true,
-        "KeyPolicy": {
-          "Statement": [
-            {
-              "Action": "kms:*",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "kms:Decrypt",
-                "kms:Encrypt",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "logs.amazonaws.com",
-              },
-              "Resource": "*",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "Tags": [
-          {
-            "Key": "aws-solutions:isb-id",
-            "Value": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Ref": "Namespace",
-                  },
-                  "_isb",
-                ],
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "AWS::KMS::Key",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "IsbKmsKeyIsbAccountPoolStackAlias26F82DA1": {
-      "Properties": {
-        "AliasName": {
-          "Fn::Join": [
-            "",
-            [
-              "alias/AwsSolutions/Sandbox/",
-              {
-                "Ref": "Namespace",
-              },
-              "/IsbAccountPoolStack",
-            ],
-          ],
-        },
-        "TargetKeyId": {
-          "Fn::GetAtt": [
-            "IsbKmsKeyIsbAccountPoolStack2E89BFA0",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
-    },
-    "IsbStackSet": {
-      "Properties": {
-        "AutoDeployment": {
-          "Enabled": true,
-          "RetainStacksOnAccountRemoval": false,
-        },
-        "Capabilities": [
-          "CAPABILITY_NAMED_IAM",
-        ],
-        "Description": "StackSet for Innovation Sandbox",
-        "ManagedExecution": {
-          "Active": true,
-        },
-        "OperationPreferences": {
-          "ConcurrencyMode": "SOFT_FAILURE_TOLERANCE",
-          "FailureTolerancePercentage": 100,
-          "MaxConcurrentPercentage": 100,
-          "RegionConcurrencyType": "PARALLEL",
-        },
-        "Parameters": [
-          {
-            "ParameterKey": "Namespace",
-            "ParameterValue": {
-              "Ref": "Namespace",
-            },
-          },
-          {
-            "ParameterKey": "HubAccountId",
-            "ParameterValue": {
-              "Ref": "HubAccountId",
-            },
-          },
-        ],
-        "PermissionModel": "SERVICE_MANAGED",
-        "StackInstancesGroup": [
-          {
-            "DeploymentTargets": {
-              "OrganizationalUnitIds": [
-                {
-                  "Fn::GetAtt": [
-                    "SandboxAccountPoolOu",
-                    "Id",
-                  ],
-                },
-              ],
-            },
-            "Regions": [
-              {
-                "Ref": "AWS::Region",
-              },
-            ],
-          },
-        ],
-        "StackSetName": {
-          "Fn::Join": [
-            "",
-            [
-              "Isb-",
-              {
-                "Ref": "Namespace",
-              },
-              "-SandboxAccountResources",
-            ],
-          ],
-        },
-        "Tags": [
-          {
-            "Key": "aws-solutions:isb-id",
-            "Value": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Ref": "Namespace",
-                  },
-                  "_isb",
-                ],
-              ],
-            },
-          },
-        ],
-        "TemplateURL": "Omitted to remove snapshot dependency on hash",
-      },
-      "Type": "AWS::CloudFormation::StackSet",
-    },
-    "OrgMgtRoleADB4C27C": {
-      "Metadata": {
-        "guard": {
-          "SuppressedRules": [
-            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
-          ],
-        },
-      },
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Condition": {
-                "ArnEquals": {
-                  "aws:PrincipalArn": {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "arn:",
-                        {
-                          "Ref": "AWS::Partition",
-                        },
-                        ":iam::",
-                        {
-                          "Ref": "HubAccountId",
-                        },
-                        ":role/Sandbox-",
-                        {
-                          "Ref": "Namespace",
-                        },
-                        "-IntermediateRole",
-                      ],
-                    ],
-                  },
-                },
-              },
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      {
-                        "Ref": "HubAccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "Description": "Role to be assumed for operations on the org management account",
-        "RoleName": {
-          "Fn::Join": [
-            "",
-            [
-              "Sandbox-",
-              {
-                "Ref": "Namespace",
-              },
-              "-OrgMgtRole",
-            ],
-          ],
-        },
-        "Tags": [
-          {
-            "Key": "aws-solutions:isb-id",
-            "Value": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Ref": "Namespace",
-                  },
-                  "_isb",
-                ],
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "OrganizationsPolicyFD65B3A6": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "organizations:ListOrganizationalUnitsForParent",
-                "organizations:ListAccountsForParent",
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "SandboxAccountPoolOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "AvailableOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ActiveOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "CleanUpOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "QuarantineOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "EntryOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExitOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "FrozenOu",
-                    "Arn",
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "organizations:MoveAccount",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "AvailableOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ActiveOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "CleanUpOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "QuarantineOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "EntryOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "ExitOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::GetAtt": [
-                    "FrozenOu",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":organizations::",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":account/",
-                      {
-                        "Fn::Select": [
-                          1,
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Fn::GetAtt": [
-                                  "SandboxAccountPoolOu",
-                                  "Arn",
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                      "/*",
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":organizations::",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root/",
-                      {
-                        "Fn::Select": [
-                          1,
-                          {
-                            "Fn::Split": [
-                              "/",
-                              {
-                                "Fn::GetAtt": [
-                                  "SandboxAccountPoolOu",
-                                  "Arn",
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                      "/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "organizations:DescribeAccount",
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":organizations::",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":account/",
-                    {
-                      "Fn::Select": [
-                        1,
-                        {
-                          "Fn::Split": [
-                            "/",
-                            {
-                              "Fn::GetAtt": [
-                                "SandboxAccountPoolOu",
-                                "Arn",
-                              ],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                    "/*",
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "OrganizationsPolicyFD65B3A6",
-        "Roles": [
-          {
-            "Ref": "OrgMgtRoleADB4C27C",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "QuarantineOu": {
-      "Properties": {
-        "Name": "Quarantine",
-        "ParentId": {
-          "Fn::GetAtt": [
-            "SandboxAccountPoolOu",
-            "Id",
-          ],
-        },
-        "Tags": [
-          {
-            "Key": "aws-solutions:isb-id",
-            "Value": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Ref": "Namespace",
-                  },
-                  "_isb",
-                ],
-              ],
-            },
-          },
-        ],
-      },
-      "Type": "AWS::Organizations::OrganizationalUnit",
-    },
   },
   "Rules": {
     "CheckBootstrapVersion": {
@@ -3900,12 +3900,12 @@ exports[`IsbComputeStack Snapshot > matches the snapshot 1`] = `
         "deploymentMode": "prod",
         "logLevel": "INFO",
         "publicEcrRegistry": "public.ecr.aws/aws-solutions",
-        "publicEcrTag": "v1.1.8",
+        "publicEcrTag": "2.0.0",
         "s3LogsArchiveRetentionInDays": 365,
         "s3LogsGlacierRetentionInDays": 2555,
-        "solutionId": "SO0284",
-        "solutionName": "innovation-sandbox-on-aws",
-        "version": "v1.1.8",
+        "solutionId": "S101",
+        "solutionName": "sandbox-for-aws",
+        "version": "2.0.0",
       },
     },
   },
@@ -4780,7 +4780,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -5729,7 +5729,7 @@ phases:
                 "sandboxOuId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -6450,7 +6450,7 @@ phases:
                 "sandboxOuId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -7014,7 +7014,7 @@ phases:
                 },
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -7375,7 +7375,7 @@ phases:
                 },
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -7986,7 +7986,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -9056,7 +9056,7 @@ phases:
                 "reportingConfigConfigurationProfileId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -9380,7 +9380,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -9988,7 +9988,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -10482,7 +10482,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -10840,7 +10840,7 @@ phases:
             "REPORT_BUCKET_NAME": {
               "Ref": "GroupCostReportingLambdaGroupCostReportingBucketF096C1FB",
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -16062,7 +16062,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -16578,7 +16578,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -16888,7 +16888,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -17304,7 +17304,7 @@ phases:
                 "reportingConfigConfigurationProfileId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -17840,7 +17840,7 @@ phases:
                 "sandboxOuId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -18426,7 +18426,7 @@ phases:
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "innovation-sandbox",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -19274,7 +19274,7 @@ fields @timestamp, @message
                 "sandboxOuId",
               ],
             },
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -19986,7 +19986,7 @@ fields @timestamp, @message
               ],
             },
             "POWERTOOLS_SERVICE_NAME": "SsoHandler",
-            "USER_AGENT_EXTRA": "AwsSolution/SO0284/v1.1.8",
+            "USER_AGENT_EXTRA": "AwsSolution/S101/2.0.0",
           },
         },
         "FunctionName": {
@@ -20283,12 +20283,12 @@ exports[`IsbDataStack Snapshot > matches the snapshot 1`] = `
         "deploymentMode": "prod",
         "logLevel": "INFO",
         "publicEcrRegistry": "public.ecr.aws/aws-solutions",
-        "publicEcrTag": "v1.1.8",
+        "publicEcrTag": "2.0.0",
         "s3LogsArchiveRetentionInDays": 365,
         "s3LogsGlacierRetentionInDays": 2555,
-        "solutionId": "SO0284",
-        "solutionName": "innovation-sandbox-on-aws",
-        "version": "v1.1.8",
+        "solutionId": "S101",
+        "solutionName": "sandbox-for-aws",
+        "version": "2.0.0",
       },
     },
   },

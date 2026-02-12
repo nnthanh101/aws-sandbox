@@ -1,0 +1,130 @@
+{
+  "name": "aws-sandbox (ADLC v3.0.0)",
+
+  // =============================================================
+  // USE dockerComposeFile for unified environment
+  // Same docker-compose.base.yml used by bare-metal AND DevContainer
+  // KISS/DRY/LEAN: Test once, works everywhere
+  //
+  // Image: nnthanh101/terraform (Node 22 + CDK v2 + AWS CLI v2)
+  // =============================================================
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "sandbox-dev",
+  "workspaceFolder": "/workspace",
+
+  // Lifecycle commands - Script-based for PDCA testability
+  "initializeCommand": "echo 'Initializing aws-sandbox DevContainer...'",
+  "onCreateCommand": ".devcontainer/scripts/on-create.sh",
+  "postCreateCommand": ".devcontainer/scripts/post-create.sh",
+  "postStartCommand": ".devcontainer/scripts/post-start.sh",
+  "postAttachCommand": ".devcontainer/scripts/post-attach.sh",
+
+  // Forward ports (same as docker-compose for IDE integration)
+  "forwardPorts": [
+    3000,  // Vite dev server
+    4566,  // LocalStack (Tier 2 testing)
+    5173,  // Alternate Vite port
+    5174,  // Alternate Vite port
+    5175   // Alternate Vite port
+  ],
+
+  "portsAttributes": {
+    "3000": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "notify",
+      "elevateIfNeeded": false
+    },
+    "4566": {
+      "label": "LocalStack",
+      "onAutoForward": "silent",
+      "elevateIfNeeded": false
+    },
+    "5173": {
+      "label": "Vite Alt",
+      "onAutoForward": "notify",
+      "elevateIfNeeded": false
+    },
+    "5174": {
+      "label": "Vite Alt 2",
+      "onAutoForward": "silent",
+      "elevateIfNeeded": false
+    },
+    "5175": {
+      "label": "Vite Alt 3",
+      "onAutoForward": "silent",
+      "elevateIfNeeded": false
+    }
+  },
+
+  // VS Code customizations (CDK/TypeScript focused)
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // TypeScript & JavaScript
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+
+        // Testing
+        "vitest.explorer",
+
+        // Task Runner & Automation
+        "task.vscode-task",
+
+        // Cloud & Infrastructure
+        "AmazonWebServices.aws-toolkit-vscode",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        // Terminal Configuration
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": ["--login"]
+          }
+        },
+
+        // Editor Configuration
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": false,
+        "editor.tabSize": 2,
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+
+        // TypeScript Configuration
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+
+        "dev.containers.showLogsTerminal": "never"
+      }
+    }
+  },
+
+  // Environment overrides (supplements docker-compose environment)
+  "remoteEnv": {
+    "ADLC_PROJECT": "aws-sandbox",
+    "ADLC_VERSION": "3.0.0",
+    "EVIDENCE_DIR": "/workspace/tmp/aws-sandbox",
+    "LOCALSTACK_ENDPOINT": "http://localhost:4566",
+    "TERM": "xterm-256color",
+    "COLORTERM": "truecolor",
+    "STARSHIP_CONFIG": "/home/os/.config/starship.toml",
+    "STARSHIP_CACHE": "/tmp/starship-cache",
+    "AWS_REGION": "ap-southeast-2",
+    "AWS_CONFIG_FILE": "/home/os/.aws/config",
+    "AWS_SHARED_CREDENTIALS_FILE": "/home/os/.aws/credentials"
+  },
+
+  "remoteUser": "os"
+}

@@ -1,6 +1,6 @@
 {
   "name": "sandbox-metrics-log-subscriber",
-  "description": "Log Subscriber - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Log Subscriber - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

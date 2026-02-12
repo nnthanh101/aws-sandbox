@@ -1,7 +1,7 @@
 {
   "name": "sandbox-layer-dependencies",
   "version": "1.1.8",
-  "description": "Dependencies - Lambda Layer - Innovation Sandbox on AWS (SO0284)",
+  "description": "Dependencies - Lambda Layer - Sandbox for AWS (S101)",
   "scripts": {
     "generate-local-package-lock": "npm install --package-lock-only --no-workspaces"
   },

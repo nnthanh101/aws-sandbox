@@ -1,6 +1,6 @@
 {
   "name": "sandbox-account-drift-monitoring",
-  "description": "Account Drift Monitoring - Lambda - Innovation Sandbox on AWS (SO0284)",
+  "description": "Account Drift Monitoring - Lambda - Sandbox for AWS (S101)",
   "version": "1.1.8",
   "scripts": {
     "build": "tsc --incremental --noEmit",

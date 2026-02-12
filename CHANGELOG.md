@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README rewritten with upstream attribution, contact changed to info@oceansoft.io
 - Replaced Amazon-specific governance files with Contributor Covenant v2.1
 - Updated license headers with dual attribution (oceansoft.io + Amazon.com, Inc.)
-- Deleted `solution-manifest.yaml` (AWS Solutions pipeline metadata — not needed for GitHub Actions)
+- Recreated `solution-manifest.yaml` with rebranded values (name: sandbox-for-aws, id: S101, version: 2.0.0)
 - Replaced `license_header.txt` with enterprise branding
 - Fixed `deployment/build-s3-dist.sh` workspace reference
 - Renamed all `InnovationSandbox-*` construct IDs to `Sandbox-*` (307 occurrences across 37 files: stack IDs, IAM roles, SCP ARN patterns, SSM params, KMS aliases, facade class, error classes)
@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - settings.local.json (Tier 2 ADLC overrides)
 - Git-push protection (agents MUST NOT push to remote)
 - Enterprise vertical customization support (FSI, Energy, Airline, Telecom, FMCG)
+- Local-first infrastructure: docker-compose.base.yml (SSOT), docker-compose.yml, .devcontainer/
+- Taskfile.yml with 42 tasks (validate, build, synth, test, docker, localstack, security, evidence, legal)
+- Playwright E2E scaffold (playwright.config.ts, tests/e2e/smoke.spec.ts)
+- NOTICE updated with REBRANDED PACKAGES section (26 packages, Apache 2.0 Section 4(c) compliant)
+- FOCUS 1.3 cost allocation tags (CostCenter, Environment, Project, Owner, ManagedBy) on all CDK resources
+- GitHub Actions CI workflow (.github/workflows/ci.yml)
 
 ### Attribution
 
