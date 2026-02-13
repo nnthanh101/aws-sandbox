@@ -7,6 +7,21 @@ import { IConstruct } from "constructs";
 export const isbTagName = "aws-solutions:isb-id";
 export const isbTagValueSuffix = "_isb";
 
+/**
+ * Enterprise cost allocation tag keys (FOCUS 1.2+ compatible, multi-cloud AWS/Azure).
+ * Ref: enterprise tagging standard v1.1.10, FinOps FOCUS 1.2 Tags column.
+ */
+export const focusCostAllocationTagKeys = [
+  "CostCenter",
+  "Environment",
+  "Project",
+  "Owner",
+  "ManagedBy",
+  "DataClassification",
+] as const;
+
+export type FocusCostAllocationTagKey = (typeof focusCostAllocationTagKeys)[number];
+
 export function applyIsbTag(scope: IConstruct, namespace: string) {
   tagAll(scope, {
     tagName: isbTagName,

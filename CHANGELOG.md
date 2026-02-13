@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README rewritten with upstream attribution, contact changed to info@oceansoft.io
 - Replaced Amazon-specific governance files with Contributor Covenant v2.1
 - Updated license headers with dual attribution (oceansoft.io + Amazon.com, Inc.)
-- Recreated `solution-manifest.yaml` with rebranded values (name: sandbox-for-aws, id: S101, version: 2.0.0)
+- Deleted `solution-manifest.yaml` — refactored `manifest-reader.ts` to read from `package.json` (KISS: one source of truth for name/version)
 - Replaced `license_header.txt` with enterprise branding
 - Fixed `deployment/build-s3-dist.sh` workspace reference
 - Renamed all `InnovationSandbox-*` construct IDs to `Sandbox-*` (307 occurrences across 37 files: stack IDs, IAM roles, SCP ARN patterns, SSM params, KMS aliases, facade class, error classes)

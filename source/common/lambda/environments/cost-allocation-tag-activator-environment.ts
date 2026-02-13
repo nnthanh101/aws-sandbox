@@ -7,6 +7,7 @@ import { BaseLambdaEnvironmentSchema } from "sandbox-commons/lambda/environments
 export const CostAllocationTagActivatorEnvironmentSchema =
   BaseLambdaEnvironmentSchema.extend({
     ISB_TAG_NAME: z.string(),
+    FOCUS_TAG_NAMES: z.string().optional().default(""),
   });
 
 export type CostAllocationTagActivatorEnvironment = z.infer<

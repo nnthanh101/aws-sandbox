@@ -1,7 +1,6 @@
 // Copyright 2026 nnthanh101@gmail.com (oceansoft.io). Based on Innovation Sandbox on AWS by Amazon.com, Inc.
 // SPDX-License-Identifier: Apache-2.0
 import fs from "fs";
-import yaml from "js-yaml";
 import path from "path";
 
 export interface SolutionManifest {
@@ -11,20 +10,12 @@ export interface SolutionManifest {
 }
 
 export function readManifest(): SolutionManifest {
-  const filePath = path.join(
-    __dirname,
-    "..",
-    "..",
-    "..",
-    "..",
-    "solution-manifest.yaml",
-  );
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  const data = yaml.load(fileContents) as SolutionManifest;
+  const pkgPath = path.join(__dirname, "..", "..", "..", "..", "package.json");
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   return {
-    name: data.name,
-    id: data.id,
-    version: data.version,
+    name: pkg.name,
+    id: "S101",
+    version: pkg.version,
   };
 }
 

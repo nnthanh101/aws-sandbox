@@ -14,12 +14,14 @@ const app = new cdk.App();
 
 const context = getSolutionContext(app.node);
 
-// FOCUS 1.3 Cost Allocation Tags (applied to all stacks)
+// Enterprise Cost Allocation Tags (FOCUS 1.2+ compatible, multi-cloud AWS/Azure)
+// Ref: enterprise tagging standard v1.1.10 (Tier 1-2), FinOps FOCUS Tags column
 cdk.Tags.of(app).add("CostCenter", "sandbox");
 cdk.Tags.of(app).add("Environment", context.deploymentMode);
 cdk.Tags.of(app).add("Project", context.solutionName);
 cdk.Tags.of(app).add("Owner", "platform-team");
 cdk.Tags.of(app).add("ManagedBy", "cdk");
+cdk.Tags.of(app).add("DataClassification", "internal");
 
 const synthesizer = new SolutionsEngineeringSynthesizer({
   generateBootstrapVersionRule: false,

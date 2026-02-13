@@ -35,18 +35,20 @@ const onCreateOrUpdate = async (
   let successStatus = "";
   try {
     const ceClient = IsbClients.costExplorer(context.env);
+    const focusTagNames = context.env.FOCUS_TAG_NAMES
+      ? context.env.FOCUS_TAG_NAMES.split(",").filter(Boolean)
+      : [];
+    const allTagKeys = [context.env.ISB_TAG_NAME, ...focusTagNames];
     const command = new UpdateCostAllocationTagsStatusCommand({
-      CostAllocationTagsStatus: [
-        {
-          TagKey: context.env.ISB_TAG_NAME,
-          Status: "Active",
-        },
-      ],
+      CostAllocationTagsStatus: allTagKeys.map((tagKey) => ({
+        TagKey: tagKey,
+        Status: "Active",
+      })),
     });
     await ceClient.send(command);
     successStatus = "success";
   } catch (error) {
-    logger.warn("Error activating cost allocation tag", error as Error);
+    logger.warn("Error activating cost allocation tags", error as Error);
     successStatus = "failed";
   }
   return {
@@ -65,18 +67,20 @@ const onDelete = async (
   let successStatus = "";
   try {
     const ceClient = IsbClients.costExplorer(context.env);
+    const focusTagNames = context.env.FOCUS_TAG_NAMES
+      ? context.env.FOCUS_TAG_NAMES.split(",").filter(Boolean)
+      : [];
+    const allTagKeys = [context.env.ISB_TAG_NAME, ...focusTagNames];
     const command = new UpdateCostAllocationTagsStatusCommand({
-      CostAllocationTagsStatus: [
-        {
-          TagKey: context.env.ISB_TAG_NAME,
-          Status: "Inactive",
-        },
-      ],
+      CostAllocationTagsStatus: allTagKeys.map((tagKey) => ({
+        TagKey: tagKey,
+        Status: "Inactive",
+      })),
     });
     await ceClient.send(command);
     successStatus = "success";
   } catch (error) {
-    logger.warn("Error deactivating cost allocation tag", error as Error);
+    logger.warn("Error deactivating cost allocation tags", error as Error);
     successStatus = "failed";
   }
   return {

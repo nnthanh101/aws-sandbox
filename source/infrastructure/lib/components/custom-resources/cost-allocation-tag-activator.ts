@@ -3,7 +3,7 @@
 
 import { CostAllocationTagActivatorEnvironmentSchema } from "sandbox-commons/lambda/environments/cost-allocation-tag-activator-environment";
 import { IsbLambdaFunctionCustomResource } from "sandbox-infrastructure/components/isb-lambda-function-custom-resource";
-import { isbTagName } from "sandbox-infrastructure/helpers/tagging-helper";
+import { isbTagName, focusCostAllocationTagKeys } from "sandbox-infrastructure/helpers/tagging-helper";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import path from "path";
@@ -42,6 +42,7 @@ export class CostAllocationTagActivator extends Construct {
         namespace: props.namespace,
         environment: {
           ISB_TAG_NAME: isbTagName,
+          FOCUS_TAG_NAMES: focusCostAllocationTagKeys.join(","),
         },
         envSchema: CostAllocationTagActivatorEnvironmentSchema,
         customResourceType: "Custom::CostAllocationTag",

@@ -130,6 +130,28 @@ export function getSandboxWriteProtectionScp(
   return convertToPolicyDocument(writeProtectionPolicy);
 }
 
+export function getSandboxEnterpriseGuardrailsScp(
+  props: IsbScpPolicyProps,
+): PolicyDocument {
+  const guardrailsPolicy = loadPolicyFromFile(
+    "isb-enterprise-guardrails-scp.json",
+    props.namespace,
+    props.isbManagedRegions,
+  );
+  return convertToPolicyDocument(guardrailsPolicy);
+}
+
+export function getSandboxDenyNukeManagementScp(
+  props: IsbScpPolicyProps,
+): PolicyDocument {
+  const denyNukeMgmtPolicy = loadPolicyFromFile(
+    "isb-deny-nuke-management-scp.json",
+    props.namespace,
+    props.isbManagedRegions,
+  );
+  return convertToPolicyDocument(denyNukeMgmtPolicy);
+}
+
 function loadPolicyFromFile(
   fileName: string,
   namespace?: string,

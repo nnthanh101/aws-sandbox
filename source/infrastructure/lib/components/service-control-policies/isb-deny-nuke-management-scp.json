@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyNukeRoleInManagementAccount",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:GetRole",
+        "iam:ListRoles",
+        "sts:GetCallerIdentity",
+        "organizations:DescribeOrganization",
+        "organizations:ListAccounts"
+      ],
+      "Resource": ["*"],
+      "Condition": {
+        "ArnLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/Sandbox-${namespace}-AwsNuke*"
+          ]
+        }
+      }
+    }
+  ]
+}

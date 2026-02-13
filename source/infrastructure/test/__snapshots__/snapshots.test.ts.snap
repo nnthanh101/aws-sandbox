@@ -1754,6 +1754,7 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
         "Environment": {
           "Variables": {
             "AWS_XRAY_CONTEXT_MISSING": "IGNORE_ERROR",
+            "FOCUS_TAG_NAMES": "CostCenter,Environment,Project,Owner,ManagedBy,DataClassification",
             "ISB_TAG_NAME": "aws-solutions:isb-id",
             "NODE_OPTIONS": "--enable-source-maps",
             "POWERTOOLS_LOG_LEVEL": {
@@ -2987,6 +2988,211 @@ exports[`IsbAccountPoolStack Snapshot > matches the snapshot 1`] = `
         },
         "Description": "Service Control Policy (SCP) to allow only services supported by AWS Nuke clean workflow. ",
         "Name": "SandboxAwsNukeSupportedServicesScp",
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+        "TargetIds": [
+          {
+            "Fn::GetAtt": [
+              "SandboxAccountPoolOu",
+              "Id",
+            ],
+          },
+        ],
+        "Type": "SERVICE_CONTROL_POLICY",
+      },
+      "Type": "AWS::Organizations::Policy",
+    },
+    "SandboxDenyNukeManagementScp": {
+      "Properties": {
+        "Content": {
+          "Statement": [
+            {
+              "Condition": {
+                "ArnLike": {
+                  "aws:PrincipalARN": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:iam::*:role/Sandbox-",
+                          {
+                            "Ref": "Namespace",
+                          },
+                          "-AwsNuke*",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+              },
+              "Effect": "Deny",
+              "NotAction": [
+                "iam:GetRole",
+                "iam:ListRoles",
+                "sts:GetCallerIdentity",
+                "organizations:DescribeOrganization",
+                "organizations:ListAccounts",
+              ],
+              "Resource": "*",
+              "Sid": "DenyNukeRoleInManagementAccount",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Deny all destructive actions from AWS Nuke role in management account context.",
+        "Name": "SandboxDenyNukeManagementScp",
+        "Tags": [
+          {
+            "Key": "aws-solutions:isb-id",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Namespace",
+                  },
+                  "_isb",
+                ],
+              ],
+            },
+          },
+        ],
+        "TargetIds": [
+          {
+            "Fn::GetAtt": [
+              "SandboxAccountPoolOu",
+              "Id",
+            ],
+          },
+        ],
+        "Type": "SERVICE_CONTROL_POLICY",
+      },
+      "Type": "AWS::Organizations::Policy",
+    },
+    "SandboxEnterpriseGuardrailsScp": {
+      "Properties": {
+        "Content": {
+          "Statement": [
+            {
+              "Action": [
+                "iam:CreateAccessKey",
+                "iam:CreateLoginProfile",
+                "iam:UpdateLoginProfile",
+                "iam:DeleteLoginProfile",
+                "iam:UpdateAccountPasswordPolicy",
+                "iam:DeleteAccountPasswordPolicy",
+                "iam:CreateServiceSpecificCredential",
+              ],
+              "Condition": {
+                "ArnNotLike": {
+                  "aws:PrincipalARN": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:iam::*:role/Sandbox-",
+                          {
+                            "Ref": "Namespace",
+                          },
+                          "*",
+                        ],
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*AWSReservedSSO_",
+                          {
+                            "Ref": "Namespace",
+                          },
+                          "_IsbAdmins*",
+                        ],
+                      ],
+                    },
+                    "arn:aws:iam::*:role/stacksets-exec-*",
+                    "arn:aws:iam::*:role/AWSControlTowerExecution",
+                  ],
+                },
+              },
+              "Effect": "Deny",
+              "Resource": "*",
+              "Sid": "DenyIamCredentialActions",
+            },
+            {
+              "Action": [
+                "s3:PutBucketPublicAccessBlock",
+                "s3:PutAccountPublicAccessBlock",
+              ],
+              "Condition": {
+                "ArnNotLike": {
+                  "aws:PrincipalARN": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:iam::*:role/Sandbox-",
+                          {
+                            "Ref": "Namespace",
+                          },
+                          "*",
+                        ],
+                      ],
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*AWSReservedSSO_",
+                          {
+                            "Ref": "Namespace",
+                          },
+                          "_IsbAdmins*",
+                        ],
+                      ],
+                    },
+                    "arn:aws:iam::*:role/stacksets-exec-*",
+                    "arn:aws:iam::*:role/AWSControlTowerExecution",
+                  ],
+                },
+              },
+              "Effect": "Deny",
+              "Resource": "*",
+              "Sid": "DenyModifyS3BlockPublicAccess",
+            },
+            {
+              "Action": [
+                "ec2:CreateVolume",
+                "ec2:RunInstances",
+              ],
+              "Condition": {
+                "Bool": {
+                  "ec2:Encrypted": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Resource": "arn:aws:ec2:*:*:volume/*",
+              "Sid": "DenyUnencryptedEbsVolumes",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Enterprise guardrails: deny IAM access keys, S3 public access, unencrypted EBS volumes.",
+        "Name": "SandboxEnterpriseGuardrailsScp",
         "Tags": [
           {
             "Key": "aws-solutions:isb-id",

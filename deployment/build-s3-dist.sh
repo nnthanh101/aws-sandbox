@@ -95,7 +95,7 @@ global_assets_dir="$deployment_dir/global-s3-assets"
 regional_assets_dir="$deployment_dir/regional-s3-assets"
 ecr_dir="$deployment_dir/ecr"
 
-# Set defaults from solution-manifest.yaml if parameters not provided
+# Set defaults from package.json if parameters not provided
 printf "\n%b=== Innovation Sandbox S3 Distribution Builder ===%b\n" "${BOLD}${PURPLE}" "${NC}"
 set_solution_params_from_manifest "$root_dir"
 
@@ -103,7 +103,7 @@ set_solution_params_from_manifest "$root_dir"
 if [ -z "$DIST_OUTPUT_BUCKET" ] || [ -z "$SOLUTION_NAME" ] || [ -z "$VERSION" ]; then
     printf "%bError: Missing required parameters\n%b" "${RED}" "${NC}"
     printf "%bRequired: --dist-output-bucket, --solution-name, and --version\n%b" "${RED}" "${NC}"
-    printf "%bSolution name and version can be provided via CLI or solution-manifest.yaml\n%b" "${YELLOW}" "${NC}"
+    printf "%bSolution name and version can be provided via CLI or package.json\n%b" "${YELLOW}" "${NC}"
     printf "\n%bExample usage:\n%b" "${YELLOW}" "${NC}"
     printf "  ./build-s3-dist.sh --dist-output-bucket solutions-bucket\n"
     printf "  ./build-s3-dist.sh --dist-output-bucket solutions-bucket --solution-name my-solution --version v1.0.0\n"

@@ -30,6 +30,8 @@ import { sharedAccountPoolSsmParamName } from "sandbox-commons/types/isb-types.j
 import { CostAllocationTagActivator } from "sandbox-infrastructure/components/custom-resources/cost-allocation-tag-activator";
 import {
   getSandboxAwsNukeSupportedServicesScp,
+  getSandboxDenyNukeManagementScp,
+  getSandboxEnterpriseGuardrailsScp,
   getSandboxLimitRegionsScp,
   getSandboxProtectScp,
   getSandboxRestrictionsScp,
@@ -186,6 +188,36 @@ export class IsbAccountPoolResources {
         entryOu.attrId,
         exitOu.attrId,
       ],
+    });
+
+    // Enterprise Guardrails SCP: IAM access key creation, S3 public access, EBS encryption
+    // NOTE: Requires AWS Organizations SCP quota increase beyond default 5/OU.
+    // See: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_reference_limits.html
+    const enterpriseGuardrailsScp = getSandboxEnterpriseGuardrailsScp({
+      namespace: props.namespace,
+    });
+
+    new CfnPolicy(scope, "SandboxEnterpriseGuardrailsScp", {
+      name: "SandboxEnterpriseGuardrailsScp",
+      description:
+        "Enterprise guardrails: deny IAM access keys, S3 public access, unencrypted EBS volumes.",
+      type: "SERVICE_CONTROL_POLICY",
+      content: enterpriseGuardrailsScp.toJSON(),
+      targetIds: [sandboxOu.attrId],
+    });
+
+    // Deny AWS Nuke role actions in management account
+    const denyNukeManagementScp = getSandboxDenyNukeManagementScp({
+      namespace: props.namespace,
+    });
+
+    new CfnPolicy(scope, "SandboxDenyNukeManagementScp", {
+      name: "SandboxDenyNukeManagementScp",
+      description:
+        "Deny all destructive actions from AWS Nuke role in management account context.",
+      type: "SERVICE_CONTROL_POLICY",
+      content: denyNukeManagementScp.toJSON(),
+      targetIds: [sandboxOu.attrId],
     });
 
     const orgMgtRole = new Role(scope, "OrgMgtRole", {

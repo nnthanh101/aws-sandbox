@@ -20,48 +20,44 @@ get_root_dir() {
     dirname "$(dirname "$(realpath "$0")")"
 }
 
-# Function to read values from solution-manifest.yaml
-# Usage: read_from_manifest "key"
-# Returns: The value associated with the key, or empty string if not found
-read_from_manifest() {
-    local key="$1"
+# Function to read values from package.json
+# Usage: read_from_package_json "field"
+read_from_package_json() {
+    local field="$1"
     local root_dir="${2:-$(get_root_dir)}"
-    local manifest_file="$root_dir/solution-manifest.yaml"
+    local pkg_file="$root_dir/package.json"
 
-    if [ -f "$manifest_file" ]; then
-        # Use grep and sed to extract the value, handling potential whitespace
-        grep "^${key}:" "$manifest_file" | sed "s/^${key}:[[:space:]]*//" | tr -d '"' | tr -d "'"
+    if [ -f "$pkg_file" ]; then
+        grep "\"${field}\"" "$pkg_file" | head -1 | sed 's/.*: *"//' | sed 's/".*//'
     fi
 }
 
-# Function to set solution parameters from manifest if not provided
+# Function to set solution parameters from package.json if not provided
 # Usage: set_solution_params_from_manifest
 # Sets global variables: SOLUTION_NAME, VERSION, SOLUTION_ID if they're empty
 set_solution_params_from_manifest() {
     local root_dir="${1:-$(get_root_dir)}"
 
-    # Set SOLUTION_NAME from manifest if not provided
+    # Set SOLUTION_NAME from package.json if not provided
     if [ -z "$SOLUTION_NAME" ]; then
-        SOLUTION_NAME=$(read_from_manifest "name" "$root_dir")
+        SOLUTION_NAME=$(read_from_package_json "name" "$root_dir")
         if [ -n "$SOLUTION_NAME" ]; then
             printf "%bSolution name: %b%s%b\n" "${BLUE}" "${WHITE}" "$SOLUTION_NAME" "${NC}"
         fi
     fi
 
-    # Set VERSION from manifest if not provided
+    # Set VERSION from package.json if not provided
     if [ -z "$VERSION" ]; then
-        VERSION=$(read_from_manifest "version" "$root_dir")
+        VERSION=$(read_from_package_json "version" "$root_dir")
         if [ -n "$VERSION" ]; then
             printf "%bVersion: %b%s%b\n" "${BLUE}" "${WHITE}" "$VERSION" "${NC}"
         fi
     fi
 
-    # Set SOLUTION_ID from manifest if not provided
+    # Set SOLUTION_ID (hardcoded — not in package.json)
     if [ -z "$SOLUTION_ID" ]; then
-        SOLUTION_ID=$(read_from_manifest "id" "$root_dir")
-        if [ -n "$SOLUTION_ID" ]; then
-            printf "%bSolution ID: %b%s%b\n" "${BLUE}" "${WHITE}" "$SOLUTION_ID" "${NC}"
-        fi
+        SOLUTION_ID="S101"
+        printf "%bSolution ID: %b%s%b\n" "${BLUE}" "${WHITE}" "$SOLUTION_ID" "${NC}"
     fi
 }
 

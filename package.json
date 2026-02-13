@@ -12,6 +12,7 @@
     "preinstall": "npm run generate-local-package-lock --workspaces --if-present",
     "test": "vitest run --coverage",
     "test:update-snapshots": "vitest run -u",
+    "test:localstack": "vitest run --config source/infrastructure/vitest.localstack.config.ts",
     "build": "npm run build --workspaces --if-present",
     "build:s3": "./deployment/build-s3-dist.sh",
     "build:open-source": "./deployment/build-open-source-dist.sh",
