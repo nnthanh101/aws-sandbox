@@ -38,6 +38,11 @@ blob-report/
 # LocalStack overrides (may contain account-specific values)
 .env.localstack
 
+# Docusaurus
+docs/.docusaurus/
+docs/build/
+docs/node_modules/
+
 # ADLC framework symlinks (local-only), ADLC framework is NOT public on GitHub
 .claude
 .specify

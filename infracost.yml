@@ -1,0 +1,18 @@
+# Infracost config for CDK-synthesized CloudFormation templates
+# Usage: infracost breakdown --config-file infracost.yml
+# Ref: https://www.infracost.io/docs/features/config_file/
+#
+# NOTE: Infracost CloudFormation support is partial.
+# Some templates auto-detect, others may not (known limitation for large/complex templates).
+# Templates are synthesized by: task synth (or docker exec sandbox-dev npx cdk synth)
+version: 0.1
+
+projects:
+  - path: source/infrastructure/cdk.out/Sandbox-IDC.template.json
+    name: Sandbox-IDC
+
+  - path: source/infrastructure/cdk.out/Sandbox-Data.template.json
+    name: Sandbox-Data
+
+  - path: source/infrastructure/cdk.out/Sandbox-SandboxAccount.template.json
+    name: Sandbox-SandboxAccount

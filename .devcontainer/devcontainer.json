@@ -1,5 +1,5 @@
 {
-  "name": "aws-sandbox (ADLC v3.0.0)",
+  "name": "aws-sandbox (ADLC v3.2.0)",
 
   // =============================================================
   // USE dockerComposeFile for unified environment
@@ -15,7 +15,9 @@
   "workspaceFolder": "/workspace",
 
   // Lifecycle commands - Script-based for PDCA testability
-  "initializeCommand": "echo 'Initializing aws-sandbox DevContainer...'",
+  // initializeCommand runs on HOST before container creation
+  // Stops standalone containers to avoid container_name conflicts
+  "initializeCommand": "echo 'Initializing aws-sandbox DevContainer...' && docker compose -f docker-compose.yml down 2>/dev/null || true",
   "onCreateCommand": ".devcontainer/scripts/on-create.sh",
   "postCreateCommand": ".devcontainer/scripts/post-create.sh",
   "postStartCommand": ".devcontainer/scripts/post-start.sh",
@@ -24,6 +26,7 @@
   // Forward ports (same as docker-compose for IDE integration)
   "forwardPorts": [
     3000,  // Vite dev server
+    3001,  // Docusaurus dev server
     4566,  // LocalStack (Tier 2 testing)
     5173,  // Alternate Vite port
     5174,  // Alternate Vite port
@@ -54,6 +57,11 @@
     "5175": {
       "label": "Vite Alt 3",
       "onAutoForward": "silent",
+      "elevateIfNeeded": false
+    },
+    "3001": {
+      "label": "Docusaurus",
+      "onAutoForward": "notify",
       "elevateIfNeeded": false
     }
   },
@@ -114,7 +122,7 @@
   // Environment overrides (supplements docker-compose environment)
   "remoteEnv": {
     "ADLC_PROJECT": "aws-sandbox",
-    "ADLC_VERSION": "3.0.0",
+    "ADLC_VERSION": "3.2.0",
     "EVIDENCE_DIR": "/workspace/tmp/aws-sandbox",
     "LOCALSTACK_ENDPOINT": "http://localhost:4566",
     "TERM": "xterm-256color",

@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # post-create.sh - Setup after container creation
-# aws-sandbox DevContainer (ADLC v3.0.0)
+# aws-sandbox DevContainer (ADLC v3.2.0)
 # =============================================================================
 set -euo pipefail
 
@@ -34,7 +34,7 @@ fi
 if ! grep -q "alias ll=" ~/.bashrc 2>/dev/null; then
     cat >> ~/.bashrc << 'ALIASES'
 
-# aws-sandbox DevContainer shell aliases (ADLC v3.0.0)
+# aws-sandbox DevContainer shell aliases (ADLC v3.2.0)
 alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'
@@ -50,7 +50,7 @@ fi
 if [ -w /etc/bash.bashrc ] && ! grep -q "DevContainer shell aliases" /etc/bash.bashrc 2>/dev/null; then
     cat >> /etc/bash.bashrc << 'SYSALIASES'
 
-# aws-sandbox DevContainer shell aliases (ADLC v3.0.0)
+# aws-sandbox DevContainer shell aliases (ADLC v3.2.0)
 alias ll='ls -la'
 alias la='ls -A'
 alias l='ls -CF'

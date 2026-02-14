@@ -18,5 +18,10 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "docs",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3001" },
+      testMatch: "docs.spec.ts",
+    },
   ],
 });

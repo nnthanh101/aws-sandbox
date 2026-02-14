@@ -4,7 +4,7 @@
 # Extends: ../docker-compose.base.yml (SINGLE SOURCE OF TRUTH)
 # Usage: VS Code "Reopen in Container"
 #
-# Constitutional: ADLC v3.0.0 (Principle IV: Hybrid Deployment)
+# Constitutional: ADLC v3.2.0 (Principle IV: Hybrid Deployment)
 # =============================================================================
 
 services:
@@ -39,6 +39,8 @@ networks:
   sandbox-network:
     driver: bridge
     name: ${NETWORK_NAME:-sandbox-network}
+    # Reuse existing network if standalone mode created it first
+    # When standalone containers run first, this prevents "network already exists" warnings
     ipam:
       config:
         - subnet: ${NETWORK_SUBNET:-172.29.0.0/16}
@@ -51,3 +53,18 @@ volumes:
     name: ${TRIVY_VOLUME:-sandbox-trivy-cache}
   npm-cache:
     name: ${NPM_VOLUME:-sandbox-npm-cache}
+
+# =============================================================================
+# IMPORTANT: Mutual Exclusivity
+# =============================================================================
+# Standalone mode (docker compose up) and DevContainer mode share the same
+# container names (sandbox-dev, sandbox-localstack). They CANNOT run simultaneously.
+#
+# To switch from standalone to DevContainer:
+#   docker compose down   # Stop standalone first
+#   Then: VS Code > "Reopen in Container"
+#
+# To switch from DevContainer to standalone:
+#   VS Code > "Reopen Locally"
+#   docker compose up -d
+# =============================================================================

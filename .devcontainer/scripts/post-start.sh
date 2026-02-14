@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # post-start.sh - Runs every time the container starts
-# aws-sandbox DevContainer (ADLC v3.0.0)
+# aws-sandbox DevContainer (ADLC v3.2.0)
 #
 # AUTONOMOUS SELF-HEALING:
 # - Validates node_modules on every start

@@ -1,0 +1,97 @@
+{
+  "mcpServers": {
+    "awslabs.cdk-toolkit": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cdk-mcp-server@latest"],
+      "description": "AWS CDK toolkit - Nag checks, best practices, CDK operations",
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.cloudformation": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cloudformation-mcp-server@latest"],
+      "description": "CloudFormation template validation and stack operations",
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.iam": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.iam-mcp-server@latest"],
+      "description": "IAM policy analysis, SCP validation, least-privilege checks",
+      "env": {
+        "AWS_PROFILE": "${AWS_MANAGEMENT_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.cost-explorer": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cost-explorer-mcp-server@latest"],
+      "description": "Cost analysis for sandbox accounts, FOCUS 1.3 cost tracking",
+      "env": {
+        "AWS_PROFILE": "${AWS_BILLING_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.lambda-tool": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.lambda-tool-mcp-server@latest"],
+      "description": "Lambda function debugging and invocation",
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.cloudwatch": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cloudwatch-mcp-server@latest"],
+      "description": "CloudWatch metrics, logs, and alarms for sandbox monitoring",
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "awslabs.terraform-mcp": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "tool",
+        "run",
+        "--from",
+        "awslabs.terraform-mcp-server@latest",
+        "awslabs.terraform-mcp-server.exe"
+      ],
+      "description": "Terraform Registry integration for CDK escape hatches",
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE}",
+        "AWS_REGION": "${AWS_DEFAULT_REGION}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL}"
+      }
+    },
+    "playwright-automation": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "description": "Playwright E2E testing with screenshot evidence capture",
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "${HOME}/.cache/ms-playwright",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}

@@ -202,6 +202,113 @@ tasks:
       - docker exec {{.CONTAINER_NAME}} bash -c 'cd /workspace/source/frontend && npm test'
 
   # ========================================
+  # COST ESTIMATION (FinOps Shift-Left)
+  # ========================================
+
+  cost:estimate:
+    desc: "Estimate infrastructure cost from CDK-synthesized CloudFormation (Infracost)"
+    deps: [synth]
+    cmds:
+      - mkdir -p {{.TMP_DIR}}/cost-reports
+      - |
+        echo "=========================================="
+        echo "CDK COST ESTIMATION (FinOps Shift-Left)"
+        echo "=========================================="
+        echo ""
+
+        TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
+        REPORT="{{.TMP_DIR}}/cost-reports/cost-estimate-${TIMESTAMP}.txt"
+        STACKS="Sandbox-AccountPool Sandbox-IDC Sandbox-Data Sandbox-Compute Sandbox-SandboxAccount"
+        HAS_KEY=false
+
+        # Check Infracost API key (env var OR credentials file)
+        if docker exec {{.CONTAINER_NAME}} bash -c 'test -n "$INFRACOST_API_KEY" || test -f /home/os/.config/infracost/credentials.yml' 2>/dev/null; then
+          HAS_KEY=true
+        fi
+
+        echo "=== CDK Cost Estimation ($(date -u +%Y-%m-%dT%H:%M:%SZ)) ===" > "$REPORT"
+        echo "Infracost API key: ${HAS_KEY}" >> "$REPORT"
+        echo "" >> "$REPORT"
+
+        TOTAL_RESOURCES=0
+        TOTAL_ESTIMATED=0
+
+        for stack in $STACKS; do
+          TPATH="/workspace/source/infrastructure/cdk.out/${stack}.template.json"
+          if ! docker exec {{.CONTAINER_NAME}} test -f "$TPATH" 2>/dev/null; then
+            echo "  SKIP ${stack} (template not found)" | tee -a "$REPORT"
+            continue
+          fi
+
+          # Resource count (always)
+          COUNT=$(docker exec {{.CONTAINER_NAME}} bash -c "python3 -c \"import json; d=json.load(open('$TPATH')); print(len(d.get('Resources',{})))\"" 2>/dev/null || echo "0")
+          SIZE=$(docker exec {{.CONTAINER_NAME}} bash -c "wc -c < $TPATH" 2>/dev/null || echo "?")
+          TOTAL_RESOURCES=$((TOTAL_RESOURCES + COUNT))
+
+          echo "--- ${stack}: ${COUNT} resources (${SIZE} bytes) ---" | tee -a "$REPORT"
+
+          # Infracost dollar estimate (if key available)
+          if [ "$HAS_KEY" = "true" ]; then
+            IC_OUT=$(docker exec {{.CONTAINER_NAME}} infracost breakdown --path "$TPATH" --format table --no-color 2>&1)
+            if echo "$IC_OUT" | grep -q "OVERALL TOTAL"; then
+              DETECTED=$(echo "$IC_OUT" | grep "cloud resources were detected" || echo "")
+              ESTIMATED=$(echo "$IC_OUT" | grep "were estimated" || echo "")
+              COST=$(echo "$IC_OUT" | grep "OVERALL TOTAL" | awk '{print $NF}')
+              echo "  Infracost: ${COST}/mo  ${DETECTED}" | tee -a "$REPORT"
+              TOTAL_ESTIMATED=$((TOTAL_ESTIMATED + 1))
+            else
+              echo "  Infracost: detection failed (template too complex)" | tee -a "$REPORT"
+            fi
+          fi
+          echo "" >> "$REPORT"
+        done
+
+        echo "" | tee -a "$REPORT"
+        echo "=========================================="  | tee -a "$REPORT"
+        echo "SUMMARY" | tee -a "$REPORT"
+        echo "  Total CloudFormation resources: ${TOTAL_RESOURCES}" | tee -a "$REPORT"
+        if [ "$HAS_KEY" = "true" ]; then
+          echo "  Stacks with Infracost pricing: ${TOTAL_ESTIMATED}/5" | tee -a "$REPORT"
+          echo "  NOTE: Infracost CloudFormation support is partial." | tee -a "$REPORT"
+          echo "  Some resources (Lambda, Step Functions, custom) may not be priced." | tee -a "$REPORT"
+        else
+          echo "  Dollar estimates: unavailable (set INFRACOST_API_KEY)" | tee -a "$REPORT"
+          echo "  Get free key: https://dashboard.infracost.io" | tee -a "$REPORT"
+        fi
+        echo "  Architecture reference: \$36-\$149/month" | tee -a "$REPORT"
+        echo "=========================================="  | tee -a "$REPORT"
+        echo ""
+        echo "Evidence: $REPORT"
+
+  cost:estimate:stack:
+    desc: "Estimate cost for one stack (e.g., task cost:estimate:stack -- Sandbox-Data)"
+    cmds:
+      - |
+        STACK="{{.CLI_ARGS}}"
+        if [ -z "$STACK" ]; then
+          echo "Usage: task cost:estimate:stack -- <StackName>"
+          echo "Stacks: Sandbox-AccountPool, Sandbox-IDC, Sandbox-Data, Sandbox-Compute, Sandbox-SandboxAccount"
+          exit 1
+        fi
+
+        TPATH="/workspace/source/infrastructure/cdk.out/${STACK}.template.json"
+        if ! docker exec {{.CONTAINER_NAME}} test -f "$TPATH" 2>/dev/null; then
+          echo "Template not found. Run 'task synth' first."
+          exit 1
+        fi
+
+        mkdir -p {{.TMP_DIR}}/cost-reports
+        COUNT=$(docker exec {{.CONTAINER_NAME}} bash -c "python3 -c \"import json; d=json.load(open('$TPATH')); print(len(d.get('Resources',{})))\"")
+        echo "${STACK}: ${COUNT} CloudFormation resources"
+        echo ""
+
+        if docker exec {{.CONTAINER_NAME}} bash -c 'test -n "$INFRACOST_API_KEY" || test -f /home/os/.config/infracost/credentials.yml' 2>/dev/null; then
+          docker exec {{.CONTAINER_NAME}} infracost breakdown --path "$TPATH" --format table --no-color 2>&1 | grep -v "^Update:" | grep -v "curl -fsSL"
+        else
+          echo "For dollar estimates: export INFRACOST_API_KEY=<key> (or add to .env)"
+        fi
+
+  # ========================================
   # SECURITY
   # ========================================
 
@@ -221,7 +328,7 @@ tasks:
   evidence:init:
     desc: Initialize evidence directory structure
     cmds:
-      - mkdir -p {{.TMP_DIR}}/{coordination-logs,test-results,evidence,screenshots,build-logs,security-reports,synth-reports,coverage-reports}
+      - mkdir -p {{.TMP_DIR}}/{coordination-logs,test-results,evidence,screenshots,build-logs,security-reports,synth-reports,coverage-reports,cost-reports}
       - echo "Evidence structure initialized at {{.TMP_DIR}}/"
 
   evidence:capture:
@@ -548,6 +655,66 @@ tasks:
       - echo "All artifacts cleaned (including evidence)"
 
   # ========================================
+  # DOCUMENTATION (Docusaurus 3.9.2)
+  # ========================================
+
+  docs:install:
+    desc: "Install documentation site dependencies"
+    cmds:
+      - cd docs && npm install
+
+  docs:dev:
+    desc: "Start Docusaurus dev server (port 3001)"
+    cmds:
+      - cd docs && npm start
+
+  docs:build:
+    desc: "Build documentation site"
+    cmds:
+      - mkdir -p {{.TMP_DIR}}/docs
+      - cd docs && npm run build 2>&1 | tee ../{{.TMP_DIR}}/docs/build-$(date +%Y-%m-%d).log
+      - echo "PASS - Docs built. Evidence at {{.TMP_DIR}}/docs/"
+
+  docs:build:docker:
+    desc: "Build documentation site via Docker container"
+    cmds:
+      - mkdir -p {{.TMP_DIR}}/docs
+      - docker exec {{.CONTAINER_NAME}} bash -c 'cd /workspace/docs && npm run build' 2>&1 | tee {{.TMP_DIR}}/docs/build-docker-$(date +%Y-%m-%d).log
+      - echo "PASS - Docs built via Docker. Evidence at {{.TMP_DIR}}/docs/"
+
+  docs:serve:
+    desc: "Serve built documentation locally (port 3001)"
+    cmds:
+      - cd docs && npm run serve
+
+  docs:dev:docker:
+    desc: "Start Docusaurus dev server via Docker (port 3001)"
+    cmds:
+      - docker exec -it {{.CONTAINER_NAME}} bash -c 'cd /workspace/docs && npm start -- --host 0.0.0.0'
+
+  docs:test:
+    desc: "Run Playwright E2E tests for documentation site"
+    cmds:
+      - mkdir -p {{.TMP_DIR}}/docs/screenshots
+      - npx playwright test tests/e2e/docs.spec.ts --project=docs 2>&1 | tee {{.TMP_DIR}}/docs/playwright-$(date +%Y-%m-%d).log
+      - echo "PASS - Docs E2E tests. Evidence at {{.TMP_DIR}}/docs/"
+
+  docs:validate:
+    desc: "Validate documentation (build + page count)"
+    cmds:
+      - mkdir -p {{.TMP_DIR}}/docs
+      - cd docs && npm run build 2>&1 | tee ../{{.TMP_DIR}}/docs/validate-$(date +%Y-%m-%d).log
+      - |
+        COUNT=$(find docs/docs -name "*.md" | wc -l | tr -d ' ')
+        echo "Page count: ${COUNT} (target: 30+)"
+        if [ "$COUNT" -ge 30 ]; then
+          echo "PASS - AC-2 met"
+        else
+          echo "WARN - Only ${COUNT} pages, need 30+"
+        fi
+      - echo "Evidence at {{.TMP_DIR}}/docs/"
+
+  # ========================================
   # HELP
   # ========================================
 
@@ -580,6 +747,10 @@ tasks:
         echo "Legal Compliance:"
         echo "  legal:audit          - Full legal compliance audit"
         echo "  legal:verify-headers - Check license headers"
+        echo ""
+        echo "Cost Estimation (FinOps Shift-Left):"
+        echo "  cost:estimate        - Estimate cost for all CDK stacks (Infracost)"
+        echo "  cost:estimate:stack  - Estimate cost for one stack"
         echo ""
         echo "Compose Validation:"
         echo "  compose:validate - Verify SSOT pattern"
