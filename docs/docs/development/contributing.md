@@ -20,6 +20,36 @@ graph LR
     REVIEW --> MERGE[Merge to Main]
 ```
 
+### CI/CD Pipeline
+
+```mermaid
+graph LR
+    subgraph "Build"
+        INSTALL[npm install] --> LINT[ESLint + Prettier]
+        LINT --> BUILD[npm run build]
+    end
+
+    subgraph "Synthesize"
+        BUILD --> SYNTH[cdk synth<br/>4 stacks]
+    end
+
+    subgraph "Test"
+        SYNTH --> TIER1[Tier 1<br/>Vitest Snapshots<br/>721 tests, 2-3s]
+        TIER1 -->|pass| TIER2[Tier 2<br/>LocalStack<br/>30-60s]
+        TIER2 -->|pass| SEC[Security Scan<br/>Trivy + Checkov]
+        SEC -->|pass| TIER3[Tier 3<br/>AWS Deploy + Test<br/>5-10min]
+    end
+
+    subgraph "Publish"
+        TIER3 -->|pass| DOCS[Docusaurus Build<br/>GitHub Pages]
+        TIER3 -->|pass| PKG[npm pack<br/>sandbox-for-aws]
+    end
+
+    style TIER1 fill:#9f9,stroke:#333
+    style TIER2 fill:#ff9,stroke:#333
+    style TIER3 fill:#f99,stroke:#333
+```
+
 ## Setup
 
 1. Clone the repository:

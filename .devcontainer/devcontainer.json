@@ -83,7 +83,11 @@
 
         // Cloud & Infrastructure
         "AmazonWebServices.aws-toolkit-vscode",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+
+        // Diagrams & Documentation
+        "bierner.markdown-mermaid",
+        "ms-python.python"
       ],
       "settings": {
         // Terminal Configuration
@@ -124,6 +128,7 @@
     "ADLC_PROJECT": "aws-sandbox",
     "ADLC_VERSION": "3.2.0",
     "EVIDENCE_DIR": "/workspace/tmp/aws-sandbox",
+    "DIAGRAMS_OUTPUT_DIR": "/workspace/docs/static/diagrams",
     "LOCALSTACK_ENDPOINT": "http://localhost:4566",
     "TERM": "xterm-256color",
     "COLORTERM": "truecolor",

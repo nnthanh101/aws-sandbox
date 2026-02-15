@@ -49,6 +49,75 @@ Each sandbox account can have budget limits:
 - Budget alerts at 50%, 80%, 100%
 - Automatic freeze at 100% (configurable)
 
+## FinOps Workflow
+
+```mermaid
+flowchart LR
+    subgraph "Shift-Left (Pre-Deploy)"
+        TAGS["Tag Validation\nFOCUS 1.3"]
+        ESTIMATE["Cost Estimation\nInfracost"]
+        REVIEW["Architecture\nCost Review"]
+    end
+
+    subgraph "Runtime"
+        CE["Cost Explorer\nDaily Tracking"]
+        BUDGET["Budget Alerts\n50%/80%/100%"]
+        ALLOC["Cost Allocation\nby Tag"]
+    end
+
+    subgraph "Optimize"
+        REPORT["Monthly\nFinOps Report"]
+        RIGHT["Right-Sizing\nRecommendations"]
+        CLEANUP["Account\nCleanup"]
+    end
+
+    TAGS -->|"pass"| ESTIMATE
+    ESTIMATE -->|"<$149/mo"| REVIEW
+    REVIEW -->|"deploy"| CE
+    CE --> BUDGET
+    CE --> ALLOC
+    ALLOC --> REPORT
+    REPORT --> RIGHT
+    RIGHT --> CLEANUP
+
+    style TAGS fill:#2d6a4f,color:#fff
+    style ESTIMATE fill:#40916c,color:#fff
+    style BUDGET fill:#e63946,color:#fff
+    style REPORT fill:#1d3557,color:#fff
+```
+
+## FOCUS 1.3 Tag Compliance
+
+All AWS resources must include these required tags for cost allocation:
+
+| Tag Key | Example Value | FOCUS 1.3 Mapping |
+|---------|--------------|-------------------|
+| `CostCenter` | `IT-Platform-001` | `x_CostCenter` |
+| `Environment` | `sandbox` | `x_Environment` |
+| `Project` | `sandbox-for-aws` | `x_Project` |
+| `Owner` | `platform-team` | `x_Owner` |
+
+Validate tag compliance before deployment:
+
+```bash
+# Check all synthesized templates for required tags
+task finops:validate-tags
+
+# Evidence saved to tmp/aws-sandbox/finops-reports/
+```
+
+## Cost-Aware Architecture
+
+The cost-aware architecture diagram (`docs/static/diagrams/cost_architecture.png`) shows resource-level cost breakdown. Generate with `task diagrams:generate`.
+
+| Layer | Components | Monthly Cost |
+|-------|-----------|-------------|
+| Edge | CloudFront, API Gateway | $5-15 |
+| Compute | 21 Lambdas, Step Functions | $10-50 |
+| Data | DynamoDB, S3, KMS | $15-60 |
+| Identity | IAM Identity Center | $0 (free) |
+| **Total** | **Hub account** | **$36-149** |
+
 ## Monitoring Costs
 
 ```bash

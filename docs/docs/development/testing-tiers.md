@@ -16,8 +16,39 @@ graph BT
     T1[Tier 1: Snapshot Tests<br/>2-3s · Free · 70-80% coverage]
     T2[Tier 2: LocalStack Integration<br/>30-60s · Free · +15-20% coverage]
     T3[Tier 3: AWS Integration<br/>5-10min · ~$50/mo · +5-10% coverage]
+    E2E[E2E: Playwright<br/>10-30s · Free · UI smoke tests]
 
     T1 --> T2 --> T3
+    T2 --> E2E
+
+    style T1 fill:#9f9,stroke:#333
+    style T2 fill:#ff9,stroke:#333
+    style T3 fill:#f99,stroke:#333
+    style E2E fill:#9ff,stroke:#333
+```
+
+### MCP Cross-Validation Overlay
+
+In addition to the 3-tier pyramid, MCP cross-validation ensures tool accuracy:
+
+```mermaid
+graph LR
+    subgraph "MCP Cross-Validation (>=99.5%)"
+        direction TB
+        MCP_OP[MCP Operation<br/>awslabs.iam list_users]
+        CLI_OP[Native CLI<br/>aws iam list-users]
+        COMPARE{Results Match?}
+        MCP_OP --> COMPARE
+        CLI_OP --> COMPARE
+    end
+
+    COMPARE -->|>=99.5%| PASS[AUTO PASS]
+    COMPARE -->|95-99.4%| HITL[HITL REVIEW]
+    COMPARE -->|<95%| FAIL[AUTO FAIL<br/>PDCA retry]
+
+    style PASS fill:#9f9,stroke:#333
+    style HITL fill:#ff9,stroke:#333
+    style FAIL fill:#f99,stroke:#333
 ```
 
 ## Tier 1: Snapshot Tests

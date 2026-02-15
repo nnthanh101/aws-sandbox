@@ -1,0 +1,79 @@
+{
+  "mcpServers": {
+    "awslabs.cdk-toolkit": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cdk-mcp-server@latest"],
+      "description": "AWS CDK toolkit (LocalStack Tier 2 routing)",
+      "env": {
+        "AWS_ENDPOINT_URL": "http://localhost:4566",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "AWS_DEFAULT_REGION": "ap-southeast-2",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "awslabs.cloudformation": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cloudformation-mcp-server@latest"],
+      "description": "CloudFormation via LocalStack (Tier 2)",
+      "env": {
+        "AWS_ENDPOINT_URL": "http://localhost:4566",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "AWS_DEFAULT_REGION": "ap-southeast-2",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "awslabs.iam": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.iam-mcp-server@latest"],
+      "description": "IAM policy analysis via LocalStack (Tier 2)",
+      "env": {
+        "AWS_ENDPOINT_URL": "http://localhost:4566",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "AWS_DEFAULT_REGION": "ap-southeast-2",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "awslabs.cloudwatch": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.cloudwatch-mcp-server@latest"],
+      "description": "CloudWatch via LocalStack (Tier 2)",
+      "env": {
+        "AWS_ENDPOINT_URL": "http://localhost:4566",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "AWS_DEFAULT_REGION": "ap-southeast-2",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "awslabs.lambda-tool": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["awslabs.lambda-tool-mcp-server@latest"],
+      "description": "Lambda function debugging via LocalStack (Tier 2)",
+      "env": {
+        "AWS_ENDPOINT_URL": "http://localhost:4566",
+        "AWS_ACCESS_KEY_ID": "test",
+        "AWS_SECRET_ACCESS_KEY": "test",
+        "AWS_DEFAULT_REGION": "ap-southeast-2",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "playwright-automation": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "description": "Playwright E2E testing with screenshot evidence capture",
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "${HOME}/.cache/ms-playwright",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}

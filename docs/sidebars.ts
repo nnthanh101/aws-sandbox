@@ -75,6 +75,9 @@ const sidebars: SidebarsConfig = {
         'architecture/cdk-stacks',
         'architecture/security-controls',
         'architecture/account-lifecycle',
+        'architecture/data-flow',
+        'architecture/multi-cloud',
+        'architecture/technology-radar',
       ],
     },
     {
@@ -94,6 +97,7 @@ const sidebars: SidebarsConfig = {
         'development/local-first',
         'development/testing-tiers',
         'development/contributing',
+        'development/adlc-framework',
       ],
     },
     {
@@ -102,6 +106,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'governance/license',
         'governance/security',
+        'governance/adlc-constitution',
       ],
     },
   ],

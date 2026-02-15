@@ -19,6 +19,10 @@ graph TD
     DATA --> COMPUTE
 ```
 
+### Detailed Stack Dependencies (with AWS icons)
+
+![CDK Stacks](/diagrams/cdk_stacks.png)
+
 ## Sandbox-AccountPool
 
 The foundation stack managing the sandbox account pool.

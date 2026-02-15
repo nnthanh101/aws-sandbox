@@ -67,6 +67,33 @@ task docs:dev             # http://localhost:3001
 - `docker-compose.yml` — Standalone/production mode
 - `.devcontainer/docker-compose.yml` — VS Code DevContainer mode
 
+```mermaid
+graph TB
+    subgraph "SSOT (Single Source of Truth)"
+        BASE["docker-compose.base.yml<br/>Services + Networks + Volumes"]
+    end
+
+    subgraph "Extends Base"
+        PROD["docker-compose.yml<br/>Standalone / CI mode<br/>+ workspace volume mount"]
+        DEVC[".devcontainer/docker-compose.yml<br/>DevContainer mode<br/>+ VS Code mounts"]
+    end
+
+    subgraph "Shared Services"
+        LS["sandbox-localstack<br/>172.29.0.2:4566<br/>AWS emulation"]
+        DEV["sandbox-dev<br/>172.29.0.3:3000,5173<br/>Node 22 + CDK v2"]
+    end
+
+    subgraph "Shared Network"
+        NET["sandbox-network<br/>172.29.0.0/16<br/>(avoids ADLC 172.28.x.x)"]
+    end
+
+    BASE --> PROD
+    BASE --> DEVC
+    PROD --> LS & DEV
+    DEVC --> LS & DEV
+    LS & DEV --> NET
+```
+
 ```bash
 # Validate SSOT pattern
 task compose:validate
@@ -80,6 +107,43 @@ Open the project in VS Code and select **Reopen in Container** to get a fully co
 - LocalStack for AWS service emulation
 - Terraform, Trivy, Checkov pre-installed
 - Port forwarding configured automatically
+
+```mermaid
+graph LR
+    subgraph "VS Code"
+        VSCODE[VS Code IDE]
+        EXT[Extensions<br/>ESLint, Prettier, CDK]
+    end
+
+    subgraph "Docker Network (172.29.0.0/16)"
+        subgraph "sandbox-dev (172.29.0.3)"
+            NODE[Node 22 + npm]
+            CDK[CDK v2 CLI]
+            AWSCLI[AWS CLI v2]
+            TF[Terraform]
+            TRIVY[Trivy Scanner]
+        end
+
+        subgraph "sandbox-localstack (172.29.0.2)"
+            S3[S3]
+            DDB[DynamoDB]
+            LAMBDA[Lambda]
+            SQS[SQS]
+            IAM[IAM/STS]
+        end
+    end
+
+    subgraph "Host Ports"
+        P3000[":3000 API"]
+        P5173[":5173 Vite"]
+        P4566[":4566 LocalStack"]
+    end
+
+    VSCODE -->|devcontainer.json| NODE
+    NODE -->|AWS_ENDPOINT_URL| S3 & DDB & LAMBDA & SQS & IAM
+    NODE ---|port forward| P3000 & P5173
+    S3 & DDB ---|port forward| P4566
+```
 
 ## Environment Variables
 

@@ -31,17 +31,61 @@ See [Security Controls](/docs/architecture/security-controls) for the full defen
 | Data | KMS encryption at rest, TLS in transit |
 | Monitoring | CloudTrail, CloudWatch, audit logs |
 
+## DevSecOps Scanning Pipeline
+
+The security scanning pipeline follows a shift-left approach — fastest and cheapest scans run first:
+
+```mermaid
+flowchart LR
+    subgraph "Shift-Left (Local, $0)"
+        SAST["SAST\nnpm audit\nlicense check"]
+        NAG["CDK Nag\nAWS Solutions\nrules"]
+        IaC["IaC Scanning\nTrivy + Checkov"]
+    end
+
+    subgraph "CI/CD"
+        PR["Pull Request\nGate"]
+        DEPLOY["Deploy\nGate"]
+    end
+
+    SAST -->|"~5s"| NAG
+    NAG -->|"~10s"| IaC
+    IaC -->|"evidence"| PR
+    PR -->|"approved"| DEPLOY
+
+    style SAST fill:#2d6a4f,color:#fff
+    style NAG fill:#40916c,color:#fff
+    style IaC fill:#52b788,color:#fff
+    style PR fill:#1d3557,color:#fff
+    style DEPLOY fill:#457b9d,color:#fff
+```
+
+### Local Security Tasks
+
+| Task | Duration | What It Checks |
+|------|----------|---------------|
+| `task security:sast` | ~5s | npm audit, license compliance, TypeScript strict mode |
+| `task security:cdknag` | ~10s | AWS Solutions rules against synthesized CloudFormation |
+| `task security:scan` | ~30s | Trivy IaC config + Checkov CloudFormation best practices |
+
+```bash
+# Run full pipeline (shift-left order)
+task security:sast && task security:cdknag && task security:scan
+
+# Individual scans
+task security:sast       # SAST (dependency + license)
+task security:cdknag     # CDK Nag (build-time rules)
+task security:scan       # Trivy + Checkov (IaC)
+```
+
+Evidence saved to `tmp/aws-sandbox/security-reports/`.
+
 ## Dependency Management
 
 - Dependencies are pinned in `package-lock.json`
 - Regular `npm audit` checks for known vulnerabilities
 - Trivy scans container images and IaC templates
 - Checkov validates CloudFormation security best practices
-
-```bash
-# Run security scan
-task security:scan
-```
 
 ## Secure Development
 

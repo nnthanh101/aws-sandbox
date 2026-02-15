@@ -105,7 +105,15 @@ sequenceDiagram
     SF-->>User: Email notification
 ```
 
-## Reference Diagrams
+## Generated Architecture Diagrams
+
+Enterprise architecture with AWS cloud icons (generated via `task diagrams:generate`):
+
+![Enterprise Architecture](/diagrams/enterprise_architecture.png)
+
+![Sandbox Components](/diagrams/sandbox_components.png)
+
+## Reference Diagrams (Legacy)
 
 The following DrawIO diagrams from the upstream project are available in `/static/diagrams/architecture/`:
 
